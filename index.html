@@ -275,10 +275,10 @@ function Galeria() {
 }
 
 /* ───────────── SECCIÓN 4 — BENEFICIOS ───────────── */
-function Benefit({ img, imgPosition = "object-center", num, title, body }) {
+function Benefit({ img, imgPosition = "object-center", imgStyle, num, title, body }) {
   return (
     <div className="bg-card rounded-2xl overflow-hidden flex flex-col">
-      <img src={img} alt="" loading="lazy" className={`aspect-video object-cover w-full ${imgPosition}`} />
+      <img src={img} alt="" loading="lazy" className={`aspect-video object-cover w-full ${imgPosition}`} style={imgStyle} />
       <div className="p-8">
         <div className="text-muted-foreground text-xs mb-4">{num}</div>
         <h3 className="font-serif text-foreground text-xl mb-3">{title}</h3>
@@ -295,7 +295,7 @@ function Beneficios() {
       <div className="grid md:grid-cols-3 gap-4">
         <Benefit img={IMG.b1} num="01" title="Precisión en cada extracción"
           body="Kalita, V60, AeroPress o espresso. Cada método es elegido para expresar lo mejor del café del día." />
-        <Benefit img={IMG.b2} imgPosition="object-top" num="02" title="Origen con propósito"
+        <Benefit img={IMG.b2} imgStyle={{ objectPosition: '50% 25%' }} num="02" title="Origen con propósito"
           body="Trabajamos con productores seleccionados. Cada grano que llega a nuestra barra tiene una historia que vale la pena conocer." />
         <Benefit img={IMG.b3} num="03" title="Un espacio para estar"
           body="No te apuramos. Ven a trabajar, leer, encontrarte con alguien, o simplemente quedarte con una buena taza." />
