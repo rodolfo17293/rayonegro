@@ -173,6 +173,7 @@ function Hero() {
       ></video>
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black to-transparent z-[1]"></div>
       <div className="absolute inset-x-0 top-0 h-1/5 bg-gradient-to-b from-black/60 to-transparent z-[1]"></div>
+      <div className="absolute inset-0 bg-black/40 z-[1] md:hidden"></div>
 
       {/* NAVBAR */}
       <nav className="relative z-10 px-8 py-6 max-w-7xl mx-auto flex justify-between items-center">
@@ -195,7 +196,7 @@ function Hero() {
         <h1 className="animate-fade-rise font-serif text-foreground text-5xl sm:text-7xl md:text-8xl leading-[0.92] tracking-[-2px] max-w-5xl font-normal">
           El <em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>rayo</em> que despierta<br />tus sentidos.
         </h1>
-        <p className="animate-fade-rise-delay text-foreground/70 text-base sm:text-lg max-w-xl mt-8 leading-relaxed">
+        <p className="animate-fade-rise-delay text-foreground/90 md:text-foreground/70 text-base sm:text-lg max-w-xl mt-8 leading-relaxed">
           Cada taza es una decisión. Un origen. Un método. Una intención. Así trabajamos en Rayo Negro.
         </p>
         <div className="animate-fade-rise-delay-2 flex gap-4 mt-12 flex-wrap justify-center items-center">
