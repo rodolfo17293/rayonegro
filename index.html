@@ -160,14 +160,19 @@ function Hero() {
   const videoRef = useRef(null);
   useEffect(() => {
     const v = videoRef.current;
-    if (v) { v.muted = true; const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+    if (v && window.innerWidth >= 768) {
+      v.muted = true;
+      const p = v.play();
+      if (p && p.catch) p.catch(() => {});
+    }
   }, []);
 
   return (
     <section className="relative min-h-screen overflow-hidden" data-screen-label="hero">
       <video
         ref={videoRef}
-        autoPlay loop muted playsInline
+        loop muted playsInline
+        poster="https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_230607_a8ff0c70-50cc-4483-a55e-3d25e4572d60.png"
         className="absolute inset-0 w-full h-full object-cover z-0"
         src={IMG.heroVideo}
       ></video>
