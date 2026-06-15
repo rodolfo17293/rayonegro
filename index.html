@@ -388,7 +388,13 @@ function CTA() {
 
 /* ───────────── SECCIÓN 7 — FOOTER ───────────── */
 function Footer() {
-  const links = ["Menú", "Métodos", "Nosotros", "Prensa", "Contacto"];
+  const links = [
+    { label: "Menú", href: "https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGn2HXtNvpDWeOosxioalKOJYZ5FnRolcKsvVIst8XNXvacgA6RZECNh9xrdLc_aem_cek8lFLAbDTa-xgl7qfbJg" },
+    { label: "Métodos", href: "#" },
+    { label: "Nosotros", href: "#beneficios" },
+    { label: "Prensa", href: "#" },
+    { label: "Contacto", href: "#" },
+  ];
   return (
     <footer className="bg-black border-t border-border">
       <div className="px-6 md:px-12 py-16 max-w-7xl mx-auto">
@@ -400,7 +406,7 @@ function Footer() {
           </div>
           <div className="flex flex-col gap-3">
             {links.map((l) => (
-              <a key={l} href="#" className="text-sm text-muted-foreground hover:text-foreground transition capitalize">{l}</a>
+              <a key={l.label} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition capitalize">{l.label}</a>
             ))}
           </div>
           <div></div>
