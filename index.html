@@ -869,38 +869,44 @@ function MetodosPage({ onBack }) {
 
 /* ───────────── PÁGINA — VENTA DE CAFÉ ───────────── */
 
-// ⚙️ CONFIGURACIÓN — reemplaza estos dos valores cuando los tengas:
-// 1) Link CSV de tu planilla (Google Sheets → Archivo → Compartir → Publicar en la web → CSV)
-const PRODUCTOS_SHEET_CSV = "";
-// 2) Tu número de WhatsApp en formato internacional sin + ni espacios (Chile: 569XXXXXXXX)
+// ⚙️ CONFIGURACIÓN — reemplaza estos valores cuando los tengas:
+// AIRTABLE — el cliente administra los productos desde airtable.com (ver guía abajo)
+//   1) Token de lectura (Personal Access Token con scope data.records:read)
+const AIRTABLE_TOKEN = "";
+//   2) ID de la base (empieza con "app", aparece en la URL de Airtable y en la API docs)
+const AIRTABLE_BASE = "";
+//   3) Nombre exacto de la tabla (por defecto "Productos")
+const AIRTABLE_TABLE = "Productos";
+// WHATSAPP — número en formato internacional sin + ni espacios (Chile: 569XXXXXXXX)
 const WHATSAPP_NUMERO = "56900000000";
 
-// Productos de ejemplo (se muestran mientras no configures la planilla; sirven de plantilla de columnas)
+// Productos de ejemplo (se muestran mientras no configures Airtable; sirven de plantilla de columnas)
 const PRODUCTOS_FALLBACK = [
   { nombre: "Etiopía Yirgacheffe", origen: "Etiopía", descripcion: "Notas florales, cítricas y un final a té negro. Nuestro café más brillante.", precio: "9990", formato: "250g · grano o molido", imagen: "" },
   { nombre: "Colombia Huila", origen: "Colombia", descripcion: "Caramelo, panela y un toque de naranja. Equilibrado y dulce, para todos los días.", precio: "8990", formato: "250g · grano o molido", imagen: "" },
   { nombre: "Guatemala Antigua", origen: "Guatemala", descripcion: "Chocolate, nuez y cuerpo redondo. El favorito de quienes aman el café con carácter.", precio: "9490", formato: "250g · grano o molido", imagen: "" },
 ];
 
-function parseCSV(text) {
-  const rows = [];
-  let row = [], field = '', inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i], next = text[i + 1];
-    if (inQuotes) {
-      if (c === '"' && next === '"') { field += '"'; i++; }
-      else if (c === '"') { inQuotes = false; }
-      else { field += c; }
-    } else {
-      if (c === '"') { inQuotes = true; }
-      else if (c === ',') { row.push(field); field = ''; }
-      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-      else if (c === '\r') { /* ignore */ }
-      else { field += c; }
+// Convierte un registro de Airtable (campos en español) al formato interno
+function mapAirtableRecord(fields) {
+  const get = (...keys) => {
+    for (const k of keys) {
+      const found = Object.keys(fields).find((f) => f.trim().toLowerCase() === k);
+      if (found && fields[found] != null && fields[found] !== '') return fields[found];
     }
-  }
-  if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
-  return rows;
+    return '';
+  };
+  const att = get('imagen', 'foto', 'image');
+  const imagen = Array.isArray(att) ? (att[0] && att[0].url) || '' : (att || '');
+  return {
+    nombre: get('nombre', 'name', 'producto'),
+    origen: get('origen', 'origin'),
+    descripcion: get('descripcion', 'descripción', 'description', 'detalle'),
+    precio: String(get('precio', 'price') || ''),
+    formato: get('formato', 'format', 'presentacion', 'presentación'),
+    imagen,
+    disponible: String(get('disponible', 'available') ?? 'si'),
+  };
 }
 
 function formatPrecio(v) {
@@ -944,18 +950,15 @@ function VentaCafePage({ onBack }) {
   const [productos, setProductos] = useState(PRODUCTOS_FALLBACK);
 
   useEffect(() => {
-    if (!PRODUCTOS_SHEET_CSV) return;
-    fetch(PRODUCTOS_SHEET_CSV)
-      .then((r) => r.text())
-      .then((text) => {
-        const rows = parseCSV(text).filter((r) => r.some((c) => c && c.trim() !== ''));
-        if (rows.length < 2) return;
-        const headers = rows[0].map((h) => h.trim().toLowerCase());
-        const items = rows.slice(1).map((r) => {
-          const o = {};
-          headers.forEach((h, i) => { o[h] = (r[i] || '').trim(); });
-          return o;
-        }).filter((o) => o.nombre && (o.disponible || 'si').toLowerCase() !== 'no');
+    if (!AIRTABLE_TOKEN || !AIRTABLE_BASE) return;
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}?pageSize=100`;
+    fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || !Array.isArray(data.records)) return;
+        const items = data.records
+          .map((rec) => mapAirtableRecord(rec.fields || {}))
+          .filter((p) => p.nombre && p.disponible.toLowerCase() !== 'no');
         if (items.length) setProductos(items);
       })
       .catch(() => { /* mantiene fallback */ });
