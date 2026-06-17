@@ -130,6 +130,7 @@
 const { useRef, useEffect, useState } = React;
 
 const IMG = {
+  libros: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260617_010735_4be8981c-71ff-45aa-9d28-8af143d2b26a.png",
   vinilo: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260617_003404_43751a93-be6e-44ce-9a5c-3cb3e8f1e623.png",
   floatLeft:  "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_222817_1f5c5e01-fcd2-41fc-b47e-39680dc1c8f3.png",
   floatRight: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_222818_e4f6e741-0930-4bdd-bfcd-a13bdc19128f.png",
@@ -390,7 +391,7 @@ function Actividades() {
       <div className="grid md:grid-cols-2 gap-4">
         <Actividad img={IMG.vinilo} kicker="Actividad 01" title="Trae tu vinilo"
           body="¿Tienes un disco que crees que todos deberían escuchar? Tráelo. Nuestra tornamesa es tuya — pones el vinilo, nosotros ponemos el café, y el local suena como tú quieras esa tarde." />
-        <Actividad img={IMG.g4} kicker="Actividad 02" title="Intercambia tu libro"
+        <Actividad img={IMG.libros} kicker="Actividad 02" title="Intercambia tu libro"
           body="Termina un libro, déjalo, llévate otro. Tenemos una pequeña biblioteca viva que crece con cada visita. Trae uno que ya leíste e intercámbialo por alguno de los que esperan en nuestra repisa." />
       </div>
     </section>
