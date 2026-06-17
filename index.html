@@ -163,6 +163,7 @@ const MENU_FUDO = "https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&u
 const NAV_LINKS = [
   { label: "Menú", href: MENU_FUDO, external: true },
   { label: "Métodos", page: "metodos" },
+  { label: "Venta de café", page: "venta" },
   { label: "Nosotros", href: "#beneficios" },
   { label: "Eventos", page: "eventos" },
   { label: "Calendario", page: "calendario" },
@@ -264,13 +265,13 @@ function Hero() {
         <a href="#" onClick={(e) => { e.preventDefault(); window.setPage('home'); }}>
           <Logo />
         </a>
-        <div className="hidden md:flex gap-10 text-sm">
+        <div className="hidden md:flex gap-6 lg:gap-8 text-sm">
           {NAV_LINKS.map((l) => (
             <a key={l.label} href={l.href || "#"}
               target={l.external ? "_blank" : undefined}
               rel={l.external ? "noopener" : undefined}
               onClick={navHandler(l)}
-              className="text-foreground/70 hover:text-foreground transition">{l.label}</a>
+              className="text-foreground/70 hover:text-foreground transition whitespace-nowrap">{l.label}</a>
           ))}
         </div>
         <a href="#cta" className="hidden md:inline-block liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
@@ -507,6 +508,7 @@ function Footer() {
   const links = [
     { label: "Menú", href: MENU_FUDO, external: true },
     { label: "Métodos", page: "metodos" },
+    { label: "Venta de café", page: "venta" },
     { label: "Nosotros", href: "#beneficios" },
     { label: "Eventos", page: "eventos" },
     { label: "Calendario", page: "calendario" },
@@ -865,6 +867,131 @@ function MetodosPage({ onBack }) {
   );
 }
 
+/* ───────────── PÁGINA — VENTA DE CAFÉ ───────────── */
+
+// ⚙️ CONFIGURACIÓN — reemplaza estos dos valores cuando los tengas:
+// 1) Link CSV de tu planilla (Google Sheets → Archivo → Compartir → Publicar en la web → CSV)
+const PRODUCTOS_SHEET_CSV = "";
+// 2) Tu número de WhatsApp en formato internacional sin + ni espacios (Chile: 569XXXXXXXX)
+const WHATSAPP_NUMERO = "56900000000";
+
+// Productos de ejemplo (se muestran mientras no configures la planilla; sirven de plantilla de columnas)
+const PRODUCTOS_FALLBACK = [
+  { nombre: "Etiopía Yirgacheffe", origen: "Etiopía", descripcion: "Notas florales, cítricas y un final a té negro. Nuestro café más brillante.", precio: "9990", formato: "250g · grano o molido", imagen: "" },
+  { nombre: "Colombia Huila", origen: "Colombia", descripcion: "Caramelo, panela y un toque de naranja. Equilibrado y dulce, para todos los días.", precio: "8990", formato: "250g · grano o molido", imagen: "" },
+  { nombre: "Guatemala Antigua", origen: "Guatemala", descripcion: "Chocolate, nuez y cuerpo redondo. El favorito de quienes aman el café con carácter.", precio: "9490", formato: "250g · grano o molido", imagen: "" },
+];
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], next = text[i + 1];
+    if (inQuotes) {
+      if (c === '"' && next === '"') { field += '"'; i++; }
+      else if (c === '"') { inQuotes = false; }
+      else { field += c; }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c === '\r') { /* ignore */ }
+      else { field += c; }
+    }
+  }
+  if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function formatPrecio(v) {
+  const n = Number(String(v).replace(/[^0-9]/g, ''));
+  if (!n) return "";
+  return "$" + n.toLocaleString('es-CL');
+}
+
+function ProductoCard({ p }) {
+  const precio = formatPrecio(p.precio);
+  const msg = `Hola Rayo Negro ⚡ Quiero pedir: ${p.nombre}${p.formato ? ` (${p.formato})` : ''}${precio ? ` — ${precio}` : ''}`;
+  const wa = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
+  return (
+    <div className="bg-card rounded-2xl overflow-hidden flex flex-col">
+      <div className="aspect-square overflow-hidden bg-black/40 flex items-center justify-center">
+        {p.imagen
+          ? <img src={p.imagen} alt={p.nombre} loading="lazy" className="object-cover w-full h-full" />
+          : <span className="font-serif text-muted-foreground/40 text-5xl">⚡</span>}
+      </div>
+      <div className="p-7 flex flex-col flex-1">
+        {p.origen && <div className="text-xs tracking-[0.2em] uppercase mb-2" style={{ color: 'hsl(var(--accent-amber))' }}>{p.origen}</div>}
+        <h3 className="font-serif text-foreground text-2xl mb-3">{p.nombre}</h3>
+        {p.descripcion && <p className="text-muted-foreground text-sm leading-relaxed mb-5">{p.descripcion}</p>}
+        <div className="mt-auto">
+          {p.formato && <div className="text-muted-foreground text-xs mb-3">{p.formato}</div>}
+          <div className="flex items-center justify-between gap-3">
+            {precio && <span className="font-serif text-foreground text-2xl">{precio}</span>}
+            <a href={wa} target="_blank" rel="noopener"
+              className="liquid-glass rounded-full px-5 py-2.5 text-sm text-foreground hover:scale-[1.03] transition flex items-center gap-2 shrink-0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.9.9-2.7-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.1-.3 0-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3a3 3 0 0 0-.9 2.2c0 1.3 1 2.6 1.1 2.8.1.2 1.9 3 4.7 4.1.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1-.1-.1-.2-.2-.4-.3z"/></svg>
+              Pedir
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VentaCafePage({ onBack }) {
+  const [productos, setProductos] = useState(PRODUCTOS_FALLBACK);
+
+  useEffect(() => {
+    if (!PRODUCTOS_SHEET_CSV) return;
+    fetch(PRODUCTOS_SHEET_CSV)
+      .then((r) => r.text())
+      .then((text) => {
+        const rows = parseCSV(text).filter((r) => r.some((c) => c && c.trim() !== ''));
+        if (rows.length < 2) return;
+        const headers = rows[0].map((h) => h.trim().toLowerCase());
+        const items = rows.slice(1).map((r) => {
+          const o = {};
+          headers.forEach((h, i) => { o[h] = (r[i] || '').trim(); });
+          return o;
+        }).filter((o) => o.nombre && (o.disponible || 'si').toLowerCase() !== 'no');
+        if (items.length) setProductos(items);
+      })
+      .catch(() => { /* mantiene fallback */ });
+  }, []);
+
+  return (
+    <main className="bg-black min-h-screen text-foreground">
+      <NavbarSimple onBack={onBack} />
+
+      {/* HERO */}
+      <section className="pt-36 pb-16 px-6 text-center max-w-3xl mx-auto">
+        <div className="w-12 h-px bg-amber-500/60 mb-8 mx-auto" />
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-5">Rayo Negro · La tienda</p>
+        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[0.92] tracking-[-2px] mb-8 font-normal">
+          Llévate el café<br /><em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>a tu casa</em>
+        </h1>
+        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+          Los mismos granos que servimos en la barra, tostados en lotes pequeños y listos para tu método favorito. Elige el tuyo y escríbenos por WhatsApp — coordinamos retiro o despacho.
+        </p>
+      </section>
+
+      {/* GRID DE PRODUCTOS */}
+      <section className="px-6 md:px-12 pb-28 max-w-7xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {productos.map((p, i) => <ProductoCard key={i} p={p} />)}
+        </div>
+        <p className="text-muted-foreground text-xs mt-10 text-center tracking-wide">
+          Precios por bolsa. Disponibilidad sujeta a la tostada de la semana.
+        </p>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
 function App() {
   const [page, setPage] = useState('home');
   window.setPage = setPage;
@@ -874,6 +1001,7 @@ function App() {
   if (page === 'eventos') return <EventosPage onBack={() => setPage('home')} />;
   if (page === 'calendario') return <CalendarioPage onBack={() => setPage('home')} />;
   if (page === 'metodos') return <MetodosPage onBack={() => setPage('home')} />;
+  if (page === 'venta') return <VentaCafePage onBack={() => setPage('home')} />;
 
   return (
     <main>
