@@ -917,7 +917,7 @@ function formatPrecio(v) {
 
 function ProductoCard({ p }) {
   const precio = formatPrecio(p.precio);
-  const msg = `Hola Rayo Negro ⚡ Quiero pedir: ${p.nombre}${p.formato ? ` (${p.formato})` : ''}${precio ? ` — ${precio}` : ''}`;
+  const msg = `Hola Rayo Negro, quiero pedir: ${p.nombre}${p.formato ? ` (${p.formato})` : ''}${precio ? ` — ${precio}` : ''}`;
   const wa = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
   return (
     <div className="bg-card rounded-2xl overflow-hidden flex flex-col">
