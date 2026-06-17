@@ -194,6 +194,7 @@ function Hero() {
             { label: "Métodos", href: "#" },
             { label: "Nosotros", href: "#beneficios" },
             { label: "Eventos", href: "#", onClick: (e) => { e.preventDefault(); window.setPage('eventos'); } },
+            { label: "Calendario", href: "#", onClick: (e) => { e.preventDefault(); window.setPage('calendario'); } },
             { label: "Contacto", href: "#" },
           ].map((t) => (
             <a key={t.label} href={t.href} onClick={t.onClick} className="text-foreground/70 hover:text-foreground transition">{t.label}</a>
@@ -578,6 +579,133 @@ function EventosPage({ onBack }) {
   );
 }
 
+/* ───────────── PÁGINA — CALENDARIO ───────────── */
+const EFEMERIDES = {
+  '03-21': { label: 'Día Mundial de la Poesía', emoji: '📝', desc: 'Las palabras también se sirven calientes. Un buen poema y un filtro largo, la combinación perfecta.' },
+  '04-23': { label: 'Día Mundial del Libro', emoji: '📚', desc: 'El mejor pretexto para intercambiar uno. Trae el que ya terminaste y llévate el próximo.' },
+  '04-26': { label: 'Día del Completo', emoji: '🌭', desc: 'El completo chileno tiene su día. Nosotros lo celebramos con café de especialidad. De origen, obvio.' },
+  '04-30': { label: 'Día Internacional del Jazz', emoji: '🎷', desc: 'El jazz y el café comparten la misma filosofía: improvisación con criterio. Hoy suena diferente.' },
+  '06-21': { label: 'Día de la Música', emoji: '🎵', desc: 'El solsticio suena mejor con un vinilo. Trae el tuyo esta tarde y ponemos la tornamesa a tu disposición.' },
+  '08-19': { label: 'Día Mundial de la Fotografía', emoji: '📷', desc: 'La mejor luz para una foto siempre fue la de la ventana de un café. Hoy más que nunca.' },
+  '09-21': { label: 'Primer Día de Primavera', emoji: '🌸', desc: 'La estación del café de origen floral. Hoy el Etiopía natural sabe diferente.' },
+  '10-01': { label: 'Día Internacional del Café', emoji: '☕', desc: 'Nuestro año nuevo. El día más importante en el calendario de Rayo Negro. Te esperamos.' },
+  '11-13': { label: 'Día Mundial de la Amabilidad', emoji: '✨', desc: 'Aquí somos amables todos los días. Hoy lo celebramos con una buena conversación y café de temporada.' },
+};
+
+function CalendarioPage({ onBack }) {
+  const now = new Date();
+  const [viewDate, setViewDate] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState(null);
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const dayNames = ['L','M','M','J','V','S','D'];
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const startOffset = (firstDay + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const prevMonth = () => { setViewDate(new Date(year, month - 1, 1)); setSelectedDay(null); };
+  const nextMonth = () => { setViewDate(new Date(year, month + 1, 1)); setSelectedDay(null); };
+
+  const isToday = (d) => d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+  const getEf = (d) => EFEMERIDES[`${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`];
+
+  const cells = [];
+  for (let i = 0; i < startOffset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const selEf = selectedDay ? getEf(selectedDay) : null;
+
+  return (
+    <main className="bg-black min-h-screen text-foreground">
+      <NavbarSimple onBack={onBack} />
+
+      {/* HERO */}
+      <section className="pt-36 pb-16 px-6 text-center max-w-3xl mx-auto">
+        <div className="w-12 h-px bg-amber-500/60 mb-8 mx-auto" />
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-5">Rayo Negro</p>
+        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[0.92] tracking-[-2px] mb-8 font-normal">
+          Calendario de<br /><em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>Efemérides</em>
+        </h1>
+        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+          Hay días que merecen celebrarse con algo más que un saludo. Aquí los marcamos, los nombramos y, cuando podemos, los vivimos dentro del café.
+        </p>
+      </section>
+
+      {/* CALENDAR */}
+      <section className="px-6 pb-28 max-w-2xl mx-auto">
+
+        {/* Month nav */}
+        <div className="flex items-center justify-between mb-10">
+          <button onClick={prevMonth} className="w-12 h-12 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition text-xl">←</button>
+          <div className="text-center">
+            <div className="font-serif text-4xl text-foreground">{monthNames[month]}</div>
+            <div className="text-muted-foreground text-sm mt-1 tracking-widest">{year}</div>
+          </div>
+          <button onClick={nextMonth} className="w-12 h-12 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition text-xl">→</button>
+        </div>
+
+        {/* Day headers */}
+        <div className="grid grid-cols-7 mb-2">
+          {dayNames.map((d, i) => (
+            <div key={i} className="text-center text-xs text-muted-foreground tracking-widest py-2 uppercase">{d}</div>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((day, i) => {
+            if (!day) return <div key={i} />;
+            const ef = getEf(day);
+            const today = isToday(day);
+            const selected = selectedDay === day;
+            return (
+              <button key={i}
+                onClick={() => ef ? setSelectedDay(selected ? null : day) : null}
+                className={[
+                  'aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 transition',
+                  ef ? 'bg-card hover:bg-white/5 cursor-pointer' : 'cursor-default',
+                  today ? 'ring-1 ring-amber-500/60' : '',
+                  selected ? 'ring-1 ring-amber-400' : '',
+                ].join(' ')}
+              >
+                <span className={`text-sm font-light ${today ? 'text-amber-400' : ef ? 'text-foreground' : 'text-muted-foreground/50'}`}>{day}</span>
+                {ef && <span className="text-xs leading-none">{ef.emoji}</span>}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Efeméride detail */}
+        {selEf && (
+          <div className="mt-8 liquid-glass rounded-2xl p-8 animate-fade-rise">
+            <div className="flex items-start gap-5">
+              <span className="text-4xl shrink-0">{selEf.emoji}</span>
+              <div>
+                <div className="text-xs tracking-[0.2em] uppercase mb-2" style={{ color: 'hsl(var(--accent-amber))' }}>
+                  {String(selectedDay).padStart(2,'0')} de {monthNames[month]}
+                </div>
+                <h3 className="font-serif text-2xl text-foreground mb-3">{selEf.label}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{selEf.desc}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Legend */}
+        <p className="text-muted-foreground text-xs mt-8 text-center tracking-wide">
+          Los días con icono son efemérides. Toca uno para ver el detalle.
+        </p>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
 function App() {
   const [page, setPage] = useState('home');
   window.setPage = setPage;
@@ -585,6 +713,7 @@ function App() {
   useEffect(() => { window.scrollTo(0, 0); }, [page]);
 
   if (page === 'eventos') return <EventosPage onBack={() => setPage('home')} />;
+  if (page === 'calendario') return <CalendarioPage onBack={() => setPage('home')} />;
 
   return (
     <main>
