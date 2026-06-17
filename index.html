@@ -162,7 +162,7 @@ const MENU_FUDO = "https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&u
 
 const NAV_LINKS = [
   { label: "Menú", href: MENU_FUDO, external: true },
-  { label: "Métodos", href: "#" },
+  { label: "Métodos", page: "metodos" },
   { label: "Nosotros", href: "#beneficios" },
   { label: "Eventos", page: "eventos" },
   { label: "Calendario", page: "calendario" },
@@ -505,10 +505,11 @@ function CTA() {
 /* ───────────── SECCIÓN 7 — FOOTER ───────────── */
 function Footer() {
   const links = [
-    { label: "Menú", href: "https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGn2HXtNvpDWeOosxioalKOJYZ5FnRolcKsvVIst8XNXvacgA6RZECNh9xrdLc_aem_cek8lFLAbDTa-xgl7qfbJg" },
-    { label: "Métodos", href: "#" },
+    { label: "Menú", href: MENU_FUDO, external: true },
+    { label: "Métodos", page: "metodos" },
     { label: "Nosotros", href: "#beneficios" },
-    { label: "Prensa", href: "#" },
+    { label: "Eventos", page: "eventos" },
+    { label: "Calendario", page: "calendario" },
     { label: "Contacto", href: "#" },
   ];
   return (
@@ -522,7 +523,12 @@ function Footer() {
           </div>
           <div className="flex flex-col gap-3">
             {links.map((l) => (
-              <a key={l.label} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition capitalize">{l.label}</a>
+              <a key={l.label}
+                href={l.href || "#"}
+                target={l.external ? "_blank" : undefined}
+                rel={l.external ? "noopener" : undefined}
+                onClick={navHandler(l)}
+                className="text-sm text-muted-foreground hover:text-foreground transition capitalize">{l.label}</a>
             ))}
           </div>
           <div>
@@ -778,6 +784,87 @@ function CalendarioPage({ onBack }) {
   );
 }
 
+/* ───────────── PÁGINA — MÉTODOS ───────────── */
+function MetodosPage({ onBack }) {
+  const metodos = [
+    {
+      num: "01", title: "Filtrado",
+      body: "El método más limpio. El agua atraviesa el café en un goteo lento y constante, revelando las notas más delicadas — florales, cítricas, brillantes. Para quien quiere escuchar el origen sin interrupciones.",
+    },
+    {
+      num: "02", title: "Chemex",
+      body: "Elegancia de laboratorio. Su filtro grueso retiene los aceites y entrega una taza translúcida, nítida, casi cristalina. El método para una sobremesa larga y una conversación que no tiene apuro.",
+    },
+    {
+      num: "03", title: "AeroPress",
+      body: "Rápida, precisa, intensa. Presión e inmersión en menos de dos minutos. Cuerpo redondo y acidez bajo control. El favorito silencioso de los que de verdad saben.",
+    },
+    {
+      num: "04", title: "Máquina espresso",
+      body: "El corazón de la barra. Nueve bares de presión que concentran todo el carácter del grano en apenas treinta mililitros. La base de tu cortado, tu flat white, tu cappuccino.",
+    },
+    {
+      num: "05", title: "Prensa francesa",
+      body: "Inmersión total, sin filtros de papel. El café conserva todos sus aceites — cuerpo pleno, textura densa, sabor sin concesiones. Quizás el método más honesto de todos.",
+    },
+    {
+      num: "06", title: "Moka italiana",
+      body: "El ritual de la cocina italiana. Vapor a presión que sube y se transforma en un café robusto, concentrado, con alma de casa. Tradición en cada borboteo.",
+    },
+  ];
+
+  return (
+    <main className="bg-black min-h-screen text-foreground">
+      <NavbarSimple onBack={onBack} />
+
+      {/* HERO */}
+      <section className="pt-36 pb-16 px-6 text-center max-w-3xl mx-auto">
+        <div className="w-12 h-px bg-amber-500/60 mb-8 mx-auto" />
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-5">Rayo Negro · La barra</p>
+        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[0.92] tracking-[-2px] mb-8 font-normal">
+          Seis formas de<br /><em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>preparar el tuyo</em>
+        </h1>
+        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+          El mismo grano cuenta una historia distinta según cómo lo extraigas. Aquí no hay un método mejor que otro — hay uno para cada momento, cada paladar, cada tarde.
+        </p>
+      </section>
+
+      {/* MÉTODOS */}
+      <section className="px-6 md:px-12 pb-28 max-w-7xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {metodos.map((m) => (
+            <div key={m.num} className="liquid-glass rounded-2xl p-8 flex flex-col">
+              <div className="font-serif text-3xl mb-5" style={{ color: 'hsl(var(--accent-amber))' }}>{m.num}</div>
+              <h3 className="font-serif text-foreground text-2xl mb-3">{m.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{m.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CIERRE */}
+      <section className="py-24 px-6 bg-black text-center">
+        <div className="w-12 h-px bg-amber-500/60 mb-10 mx-auto" />
+        <h2 className="font-serif text-3xl sm:text-5xl mb-6 max-w-2xl mx-auto leading-tight">
+          ¿No sabes cuál es el tuyo?
+        </h2>
+        <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-12 leading-relaxed">
+          Ven a la barra y cuéntanos cómo te gusta el café. Nosotros te recomendamos el método — y, si quieres, te lo explicamos mientras lo preparamos.
+        </p>
+        <button onClick={onBack}
+          className="liquid-glass rounded-full px-14 py-5 text-base text-foreground hover:scale-[1.03] transition inline-block">
+          Visítanos
+        </button>
+        <p className="text-muted-foreground text-xs mt-6 tracking-wider">
+          Av. Irarrázaval 1309, Ñuñoa
+        </p>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
 function App() {
   const [page, setPage] = useState('home');
   window.setPage = setPage;
@@ -786,6 +873,7 @@ function App() {
 
   if (page === 'eventos') return <EventosPage onBack={() => setPage('home')} />;
   if (page === 'calendario') return <CalendarioPage onBack={() => setPage('home')} />;
+  if (page === 'metodos') return <MetodosPage onBack={() => setPage('home')} />;
 
   return (
     <main>
