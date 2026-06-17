@@ -197,9 +197,12 @@ function Hero() {
             <a key={t.label} href={t.href} onClick={t.onClick} className="text-foreground/70 hover:text-foreground transition">{t.label}</a>
           ))}
         </div>
-        <a href="#cta" className="liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
-          Encuéntranos
-        </a>
+        <div className="flex items-center gap-4">
+          <img src="assets/fotos/LOGO.png" alt="Rayo Negro" className="w-10 h-10 object-contain" />
+          <a href="#cta" className="liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
+            Encuéntranos
+          </a>
+        </div>
       </nav>
 
       {/* CONTENIDO */}
@@ -446,9 +449,12 @@ function NavbarSimple({ onBack }) {
       <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>
         <Logo />
       </a>
-      <button onClick={onBack} className="text-muted-foreground text-sm hover:text-foreground transition flex items-center gap-2">
-        ← Volver
-      </button>
+      <div className="flex items-center gap-4">
+        <img src="assets/fotos/LOGO.png" alt="Rayo Negro" className="w-10 h-10 object-contain" />
+        <button onClick={onBack} className="liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
+          ← Volver
+        </button>
+      </div>
     </nav>
   );
 }
