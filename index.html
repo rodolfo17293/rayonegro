@@ -184,7 +184,7 @@ function Hero() {
       {/* NAVBAR */}
       <nav className="relative z-10 px-8 py-6 max-w-7xl mx-auto flex justify-between items-center">
         <a href="#" onClick={(e) => { e.preventDefault(); window.setPage('home'); }}>
-          <img src="assets/fotos/LOGO.png" alt="Rayo Negro" className="w-12 h-12 object-contain" />
+          <Logo />
         </a>
         <div className="hidden md:flex gap-10 text-sm">
           {[
@@ -444,7 +444,7 @@ function NavbarSimple({ onBack }) {
   return (
     <nav className="fixed top-0 inset-x-0 z-50 px-8 py-6 max-w-7xl mx-auto flex justify-between items-center">
       <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>
-        <img src="assets/fotos/LOGO.png" alt="Rayo Negro" className="w-12 h-12 object-contain" />
+        <Logo />
       </a>
       <button onClick={onBack} className="text-muted-foreground text-sm hover:text-foreground transition flex items-center gap-2">
         ← Volver
