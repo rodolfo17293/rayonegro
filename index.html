@@ -362,6 +362,40 @@ function Testimoniales() {
   );
 }
 
+/* ───────────── SECCIÓN — ACTIVIDADES ───────────── */
+function Actividad({ img, kicker, title, body }) {
+  return (
+    <div className="bg-card rounded-2xl overflow-hidden flex flex-col group">
+      <div className="aspect-[4/3] overflow-hidden">
+        <img src={img} alt="" loading="lazy"
+          className="object-cover w-full h-full group-hover:scale-[1.03] transition-transform duration-700" />
+      </div>
+      <div className="p-8">
+        <div className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: 'hsl(var(--accent-amber))' }}>{kicker}</div>
+        <h3 className="font-serif text-foreground text-2xl mb-3">{title}</h3>
+        <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
+      </div>
+    </div>
+  );
+}
+function Actividades() {
+  return (
+    <section className="px-6 md:px-12 py-28 max-w-7xl mx-auto">
+      <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-4">Más que una taza</p>
+      <h2 className="font-serif text-foreground text-3xl sm:text-5xl mb-6 max-w-2xl">Cosas que pasan entre sorbo y sorbo</h2>
+      <p className="text-muted-foreground text-base sm:text-lg max-w-xl mb-16 leading-relaxed">
+        Rayo Negro no es solo café. Es un lugar donde las cosas suceden. Estas son algunas de las nuestras.
+      </p>
+      <div className="grid md:grid-cols-2 gap-4">
+        <Actividad img={IMG.g2} kicker="Actividad 01" title="Trae tu vinilo"
+          body="¿Tienes un disco que crees que todos deberían escuchar? Tráelo. Nuestra tornamesa es tuya — pones el vinilo, nosotros ponemos el café, y el local suena como tú quieras esa tarde." />
+        <Actividad img={IMG.g4} kicker="Actividad 02" title="Intercambia tu libro"
+          body="Termina un libro, déjalo, llévate otro. Tenemos una pequeña biblioteca viva que crece con cada visita. Trae uno que ya leíste e intercámbialo por alguno de los que esperan en nuestra repisa." />
+      </div>
+    </section>
+  );
+}
+
 /* ───────────── SECCIÓN 6 — CTA ───────────── */
 function CTA() {
   return (
@@ -557,6 +591,7 @@ function App() {
       <Galeria />
       <Beneficios />
       <Testimoniales />
+      <Actividades />
       <CTA />
       <Footer />
     </main>
