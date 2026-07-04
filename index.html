@@ -1003,16 +1003,35 @@ function VentaCafePage({ onBack }) {
   );
 }
 
+const VALID_PAGES = ['metodos', 'venta', 'eventos', 'calendario'];
+function pageFromHash() {
+  const h = (window.location.hash || '').replace('#', '');
+  return VALID_PAGES.includes(h) ? h : 'home';
+}
+
 function App() {
-  const [page, setPage] = useState('home');
-  window.setPage = setPage;
+  const [page, setPageState] = useState(pageFromHash());
+
+  window.setPage = (p) => {
+    setPageState(p);
+    const hash = p === 'home' ? '' : `#${p}`;
+    if (window.location.hash !== hash) {
+      window.history.pushState({ page: p }, '', window.location.pathname + window.location.search + hash);
+    }
+  };
+
+  useEffect(() => {
+    const onPopState = () => setPageState(pageFromHash());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   useEffect(() => { window.scrollTo(0, 0); }, [page]);
 
-  if (page === 'eventos') return <EventosPage onBack={() => setPage('home')} />;
-  if (page === 'calendario') return <CalendarioPage onBack={() => setPage('home')} />;
-  if (page === 'metodos') return <MetodosPage onBack={() => setPage('home')} />;
-  if (page === 'venta') return <VentaCafePage onBack={() => setPage('home')} />;
+  if (page === 'eventos') return <EventosPage onBack={() => window.setPage('home')} />;
+  if (page === 'calendario') return <CalendarioPage onBack={() => window.setPage('home')} />;
+  if (page === 'metodos') return <MetodosPage onBack={() => window.setPage('home')} />;
+  if (page === 'venta') return <VentaCafePage onBack={() => window.setPage('home')} />;
 
   return (
     <main>
