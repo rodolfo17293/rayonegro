@@ -182,7 +182,7 @@ const NAV_LINKS = [
   { label: "Nosotros", href: "#beneficios" },
   { label: "Eventos", page: "eventos" },
   { label: "Calendario", page: "calendario" },
-  { label: "Contacto", href: "#" },
+  { label: "Contacto", href: "#cta" },
 ];
 
 function navHandler(link, onDone) {
@@ -506,7 +506,7 @@ function CTA() {
           Lunes a viernes 8:00–19:00. Sábado 9:00–20:00. Domingo 9:00–14:00. Siempre con café de temporada.
         </p>
         <div className="flex gap-4 flex-wrap justify-center">
-          <a href="#" className="liquid-glass rounded-full px-12 py-4 text-sm text-foreground hover:scale-[1.03] transition">
+          <a href="https://www.google.com/maps/search/?api=1&query=Av.+Irarr%C3%A1zaval+1309%2C+%C3%91u%C3%B1oa%2C+Santiago" target="_blank" rel="noopener" className="liquid-glass rounded-full px-12 py-4 text-sm text-foreground hover:scale-[1.03] transition">
             Cómo llegar
           </a>
           <a href="https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGn2HXtNvpDWeOosxioalKOJYZ5FnRolcKsvVIst8XNXvacgA6RZECNh9xrdLc_aem_cek8lFLAbDTa-xgl7qfbJg" target="_blank" rel="noopener" className="rounded-full px-12 py-4 text-sm text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30 transition">
@@ -527,7 +527,7 @@ function Footer() {
     { label: "Nosotros", href: "#beneficios" },
     { label: "Eventos", page: "eventos" },
     { label: "Calendario", page: "calendario" },
-    { label: "Contacto", href: "#" },
+    { label: "Contacto", href: "#cta" },
   ];
   return (
     <footer className="bg-black border-t border-border">
@@ -562,12 +562,8 @@ function Footer() {
             </div>
           </div>
         </div>
-        <div className="flex justify-between items-center pt-8 border-t border-border text-xs text-muted-foreground flex-wrap gap-4">
-          <span className="text-foreground">© 2025 Rayo Negro</span>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-foreground transition">Política de privacidad</a>
-            <a href="#" className="hover:text-foreground transition">Términos y condiciones</a>
-          </div>
+        <div className="flex justify-center items-center pt-8 border-t border-border text-xs text-muted-foreground flex-wrap gap-4">
+          <span className="text-foreground">© 2026 Rayo Negro</span>
         </div>
       </div>
     </footer>
@@ -970,21 +966,27 @@ function ProductoCard({ p }) {
 }
 
 function VentaCafePage({ onBack }) {
-  const [productos, setProductos] = useState(PRODUCTOS_FALLBACK);
+  const configurado = Boolean(AIRTABLE_TOKEN && AIRTABLE_BASE);
+  const [estado, setEstado] = useState(configurado ? 'cargando' : 'sin-configurar');
+  const [productos, setProductos] = useState(configurado ? [] : PRODUCTOS_FALLBACK);
 
   useEffect(() => {
-    if (!AIRTABLE_TOKEN || !AIRTABLE_BASE) return;
+    if (!configurado) return;
     const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}?pageSize=100`;
     fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('airtable-error');
+        return r.json();
+      })
       .then((data) => {
-        if (!data || !Array.isArray(data.records)) return;
+        if (!data || !Array.isArray(data.records)) throw new Error('airtable-error');
         const items = data.records
           .map((rec) => mapAirtableRecord(rec.fields || {}))
           .filter((p) => p.nombre && p.disponible.toLowerCase() !== 'no');
-        if (items.length) setProductos(items);
+        setProductos(items);
+        setEstado(items.length ? 'ok' : 'vacio');
       })
-      .catch(() => { /* mantiene fallback */ });
+      .catch(() => setEstado('error'));
   }, []);
 
   return (
@@ -1005,12 +1007,35 @@ function VentaCafePage({ onBack }) {
 
       {/* GRID DE PRODUCTOS */}
       <section className="px-6 md:px-12 pb-28 max-w-7xl mx-auto">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {productos.map((p, i) => <ProductoCard key={i} p={p} />)}
-        </div>
-        <p className="text-muted-foreground text-xs mt-10 text-center tracking-wide">
-          Precios por bolsa. Disponibilidad sujeta a la tostada de la semana.
-        </p>
+        {estado === 'cargando' && (
+          <p className="text-center text-muted-foreground text-sm py-16">Cargando catálogo…</p>
+        )}
+
+        {estado === 'error' && (
+          <div className="text-center max-w-md mx-auto py-16">
+            <p className="text-foreground text-lg mb-3">No pudimos cargar el catálogo en este momento.</p>
+            <p className="text-muted-foreground text-sm mb-7 leading-relaxed">Escríbenos por WhatsApp y te contamos qué café tenemos disponible hoy.</p>
+            <a href={`https://wa.me/${WHATSAPP_NUMERO}`} target="_blank" rel="noopener"
+              className="liquid-glass rounded-full px-8 py-3 text-sm text-foreground inline-block hover:scale-[1.03] transition">
+              Escribir por WhatsApp
+            </a>
+          </div>
+        )}
+
+        {estado === 'vacio' && (
+          <p className="text-center text-muted-foreground text-sm py-16">Por ahora no tenemos cafés disponibles. Vuelve pronto.</p>
+        )}
+
+        {(estado === 'ok' || estado === 'sin-configurar') && (
+          <React.Fragment>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {productos.map((p, i) => <ProductoCard key={i} p={p} />)}
+            </div>
+            <p className="text-muted-foreground text-xs mt-10 text-center tracking-wide">
+              Precios por bolsa. Disponibilidad sujeta al tueste de la semana.
+            </p>
+          </React.Fragment>
+        )}
       </section>
 
       <Footer />
