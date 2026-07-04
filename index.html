@@ -402,7 +402,7 @@ function Beneficios() {
       <h2 className="font-serif text-foreground text-3xl sm:text-5xl mb-16 max-w-xl">Lo que nos hace distintos</h2>
       <div className="grid md:grid-cols-3 gap-4">
         <Benefit img={IMG.b1} num="01" title="Precisión en cada extracción"
-          body="Kalita, V60, AeroPress o espresso. Cada método es elegido para expresar lo mejor del café del día." />
+          body="Chemex, AeroPress, prensa francesa o espresso. Cada método es elegido para expresar lo mejor del café del día." />
         <Benefit img={IMG.b2} imgStyle={{ objectPosition: '50% 50%' }} num="02" title="Origen con propósito"
           body="Trabajamos con productores seleccionados. Cada grano que llega a nuestra barra tiene una historia que vale la pena conocer." />
         <Benefit img={IMG.b3} num="03" title="Un espacio para estar"
@@ -537,6 +537,9 @@ function Footer() {
             <img src="assets/fotos/logo-footer.webp" alt="Rayo Negro" className="w-24 h-24 object-contain mb-2" />
             <p className="text-muted-foreground text-sm mt-1 leading-relaxed">Café de especialidad. Santiago, Chile.</p>
             <p className="text-muted-foreground text-sm mt-1">Av. Irarrázaval 1309, Ñuñoa</p>
+            <p className="text-muted-foreground text-sm mt-3 leading-relaxed">
+              Lunes a viernes 8:00–19:00<br />Sábado 9:00–20:00<br />Domingo 9:00–14:00
+            </p>
           </div>
           <div className="flex flex-col gap-3">
             {links.map((l) => (
@@ -553,7 +556,7 @@ function Footer() {
             <div className="flex flex-col gap-3">
               <a href="https://www.instagram.com/caferayonegro?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-                @rayonegrocafe
+                @caferayonegro
               </a>
               <a href="https://www.facebook.com/rayonegrocafe" target="_blank" rel="noopener" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -604,7 +607,7 @@ function EventosPage({ onBack }) {
   const tipos = [
     { icon: "🎂", label: "Cumpleaños", desc: "Celebra rodeado de buen café y buena gente. Nosotros ponemos el espacio, tú pones la historia." },
     { icon: "💼", label: "Reuniones de trabajo", desc: "Porque las mejores ideas nacen con una buena taza en la mano. Sin sala de reuniones genérica, sin café de máquina." },
-    { icon: "📖", label: "Clubs de lectura", desc: "El silencio correcto, la iluminación correcta, el café correcto. Un espacio para encontrarse con las palabras." },
+    { icon: "📖", label: "Clubes de lectura", desc: "El silencio correcto, la iluminación correcta, el café correcto. Un espacio para encontrarse con las palabras." },
     { icon: "🎤", label: "Lanzamientos y presentaciones", desc: "Marcas, proyectos, libros, discos. Un espacio íntimo que habla de cuidado y carácter." },
     { icon: "🌿", label: "Talleres y workshops", desc: "Desde cata de cafés hasta clases de fotografía. Un ambiente que inspira a aprender y crear." },
     { icon: "✨", label: "Lo que imagines", desc: "Si tienes una idea y no sabes si cabe aquí, escríbenos igual. Probablemente sí cabe." },
@@ -799,7 +802,7 @@ function CalendarioPage({ onBack }) {
 
         {/* Legend */}
         <p className="text-muted-foreground text-xs mt-8 text-center tracking-wide">
-          Los días con icono son efemérides. Toca uno para ver el detalle.
+          Los días con ícono son efemérides. Toca uno para ver el detalle.
         </p>
       </section>
 
