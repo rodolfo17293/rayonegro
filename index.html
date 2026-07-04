@@ -568,6 +568,15 @@ function NavbarSimple({ onBack }) {
         <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>
           <Logo />
         </a>
+        <div className="hidden md:flex gap-6 lg:gap-8 text-sm">
+          {NAV_LINKS.map((l) => (
+            <a key={l.label} href={l.href || "#"}
+              target={l.external ? "_blank" : undefined}
+              rel={l.external ? "noopener" : undefined}
+              onClick={navHandler(l)}
+              className="text-foreground/70 hover:text-foreground transition whitespace-nowrap">{l.label}</a>
+          ))}
+        </div>
         <button onClick={onBack} className="hidden md:inline-block liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
           ← Volver
         </button>
