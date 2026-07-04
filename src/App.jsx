@@ -1,0 +1,952 @@
+
+import React, { useRef, useEffect, useState } from 'react';
+
+const IMG = {
+  libros: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260617_010114_3fe42339-595f-40e9-aa67-60aa6c43fd1a.png",
+  vinilo: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260617_003404_43751a93-be6e-44ce-9a5c-3cb3e8f1e623.png",
+  floatLeft:  "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_222817_1f5c5e01-fcd2-41fc-b47e-39680dc1c8f3.png",
+  floatRight: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_222818_e4f6e741-0930-4bdd-bfcd-a13bdc19128f.png",
+  g1: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_215944_be51f4c8-693a-4abd-93e6-384dd14ebb9e.png",
+  g2: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_215953_0ecb900b-02c7-40ae-b392-5d3a57596897.png",
+  g3: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_215950_1719f176-b3ca-4e97-85dd-ce5c2ba23ac8.png",
+  g4: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_215947_de315b99-7d97-4518-bd17-b434989d2867.png",
+  g5: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_215956_006b99ce-3f1c-4551-a7ef-e849297a2164.png",
+  g6: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_220005_4837628d-0a08-4f23-9d57-0b8f91bf3247.png",
+  b1: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_222821_cb6a7cbe-164a-49c7-aa0e-1c71cd2a3ca2.png",
+  b2: "assets/fotos/origen-con-proposito.webp",
+  b3: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_215959_e3f04598-bbbf-449b-bf08-03502d60f2d0.png",
+  testiBg: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_220002_4ac14831-70d1-471a-9112-0c763ec88534.png",
+  ctaBg: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_222823_91b8d4c5-3637-42ea-963e-80b5166c5428.png",
+  heroVideo: "https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_233934_1d1888bf-d269-417d-9abf-47054bb173e6.mp4",
+  vaso: "assets/vaso-rayo-negro.webp",
+};
+
+function Logo({ size = "text-xl" }) {
+  return (
+    <span className={`font-sans ${size} tracking-[0.25em] uppercase text-foreground inline-flex items-center gap-1.5`}>
+      Rayo Negro
+      <span className="text-[0.7em]" style={{ color: 'hsl(var(--accent-amber))' }}>⚡</span>
+    </span>
+  );
+}
+
+const MENU_FUDO = "https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGn2HXtNvpDWeOosxioalKOJYZ5FnRolcKsvVIst8XNXvacgA6RZECNh9xrdLc_aem_cek8lFLAbDTa-xgl7qfbJg";
+
+const NAV_LINKS = [
+  { label: "Menú", href: MENU_FUDO, external: true },
+  { label: "Métodos", page: "metodos" },
+  { label: "Venta de café", page: "venta" },
+  { label: "Nosotros", href: "#beneficios" },
+  { label: "Eventos", page: "eventos" },
+  { label: "Calendario", page: "calendario" },
+  { label: "Contacto", href: "#cta" },
+];
+
+function navHandler(link, onDone) {
+  return (e) => {
+    if (link.page) {
+      e.preventDefault();
+      window.setPage(link.page);
+    } else if (!link.external && link.href && link.href.startsWith('#')) {
+      e.preventDefault();
+      window.setPage('home');
+      const target = link.href.length > 1 ? link.href : null;
+      setTimeout(() => {
+        if (target) {
+          const el = document.querySelector(target);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 60);
+    }
+    if (onDone) onDone();
+  };
+}
+
+function Hamburger({ onClick }) {
+  return (
+    <button onClick={onClick} aria-label="Abrir menú"
+      className="lg:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5">
+      <span className="block w-6 h-px bg-foreground"></span>
+      <span className="block w-6 h-px bg-foreground"></span>
+      <span className="block w-6 h-px bg-foreground"></span>
+    </button>
+  );
+}
+
+function MobileMenu({ open, onClose }) {
+  return (
+    <div className={`fixed inset-0 z-[60] md:hidden transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+      <div className="absolute inset-0 bg-black/95" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} onClick={onClose}></div>
+      <div className="relative z-10 flex flex-col h-full px-8 py-6">
+        <div className="flex justify-between items-center">
+          <Logo />
+          <button onClick={onClose} aria-label="Cerrar menú"
+            className="w-11 h-11 flex items-center justify-center text-foreground text-2xl leading-none hover:opacity-70 transition">✕</button>
+        </div>
+        <nav className="flex flex-col gap-7 mt-16">
+          {NAV_LINKS.map((l) => (
+            <a key={l.label}
+              href={l.href || "#"}
+              target={l.external ? "_blank" : undefined}
+              rel={l.external ? "noopener" : undefined}
+              onClick={navHandler(l, onClose)}
+              className="font-serif text-3xl text-foreground/90 hover:text-foreground transition">
+              {l.label}
+            </a>
+          ))}
+          <a href="#cta" onClick={(e) => { e.preventDefault(); window.setPage('home'); onClose(); setTimeout(() => { const el = document.getElementById('cta'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60); }}
+            className="liquid-glass rounded-full px-8 py-4 text-base text-foreground text-center mt-6">
+            Encuéntranos
+          </a>
+        </nav>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────── SECCIÓN 1 — HERO ───────────── */
+function Hero() {
+  const videoRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v && window.innerWidth >= 768) {
+      v.muted = true;
+      const p = v.play();
+      if (p && p.catch) p.catch(() => {});
+    }
+  }, []);
+
+  return (
+    <section className="relative min-h-screen overflow-hidden" data-screen-label="hero">
+      <video
+        ref={videoRef}
+        loop muted playsInline
+        poster="https://d8j0ntlcm91z4.cloudfront.net/user_3EsEl3qJ3ZKxReLoGNp3Ln0RKSf/hf_20260609_230607_a8ff0c70-50cc-4483-a55e-3d25e4572d60.png"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        src={IMG.heroVideo}
+      ></video>
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black to-transparent z-[1]"></div>
+      <div className="absolute inset-x-0 top-0 h-1/5 bg-gradient-to-b from-black/60 to-transparent z-[1]"></div>
+      <div className="absolute inset-0 bg-black/40 z-[1] md:hidden"></div>
+
+      {/* NAVBAR */}
+      <nav className="relative z-20 px-6 md:px-8 py-6 max-w-7xl mx-auto flex justify-between items-center">
+        <a href="#" onClick={(e) => { e.preventDefault(); window.setPage('home'); }}>
+          <Logo />
+        </a>
+        <div className="hidden lg:flex gap-8 text-sm">
+          {NAV_LINKS.map((l) => (
+            <a key={l.label} href={l.href || "#"}
+              target={l.external ? "_blank" : undefined}
+              rel={l.external ? "noopener" : undefined}
+              onClick={navHandler(l)}
+              className="text-foreground/70 hover:text-foreground transition whitespace-nowrap">{l.label}</a>
+          ))}
+        </div>
+        <a href="#cta" className="hidden lg:inline-block liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
+          Encuéntranos
+        </a>
+        <Hamburger onClick={() => setMenuOpen(true)} />
+      </nav>
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      {/* CONTENIDO */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center pb-40 pt-8 px-6">
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-6">
+          Café de especialidad · Santiago
+        </p>
+        <h1 className="animate-fade-rise font-serif text-foreground text-5xl sm:text-7xl md:text-8xl leading-[0.92] tracking-[-2px] max-w-5xl font-normal">
+          El <em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>rayo</em> que despierta<br />tus sentidos.
+        </h1>
+        <p className="animate-fade-rise-delay text-foreground/90 md:text-foreground/70 text-base sm:text-lg max-w-xl mt-8 leading-relaxed">
+          Cada taza es una decisión. Un origen. Un método. Una intención. Así trabajamos en Rayo Negro.
+        </p>
+        <div className="animate-fade-rise-delay-2 flex gap-4 mt-12 flex-wrap justify-center items-center">
+          <a href="https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGn2HXtNvpDWeOosxioalKOJYZ5FnRolcKsvVIst8XNXvacgA6RZECNh9xrdLc_aem_cek8lFLAbDTa-xgl7qfbJg" target="_blank" rel="noopener" className="liquid-glass rounded-full px-12 py-4 text-sm text-foreground hover:scale-[1.03] transition">
+            Ver el menú
+          </a>
+          <a href="#cta" className="text-muted-foreground text-sm hover:text-foreground transition underline underline-offset-4">
+            Local 1309 ↓
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── SECCIÓN 2 — TRUST ───────────── */
+function Trust() {
+  const stats = [
+    { v: "6", l: "Métodos de extracción" },
+    { v: "100%", l: "Café de especialidad" },
+    { v: "8", l: "Años de historia" },
+  ];
+  return (
+    <section className="relative min-h-[65vh] flex flex-col items-center justify-center bg-black px-6 overflow-hidden py-20">
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="w-12 h-px bg-amber-500/60 mb-10 mx-auto"></div>
+        <h2 className="font-serif text-foreground text-4xl sm:text-6xl md:text-7xl leading-[1.05] tracking-[-1.5px] max-w-4xl text-center">
+          No servimos café.<br />Preparamos el tuyo.
+        </h2>
+        <p className="text-muted-foreground text-base sm:text-lg mt-6 max-w-2xl text-center leading-relaxed">
+          Trabajamos con productores seleccionados de Colombia, Etiopía y Guatemala. Cada grano llega a nuestra barra con propósito.
+        </p>
+        <div className="flex gap-12 mt-14 justify-center flex-wrap">
+          {stats.map((s) => (
+            <div key={s.l} className="text-center">
+              <div className="font-serif text-foreground text-4xl">{s.v}</div>
+              <div className="text-muted-foreground text-xs tracking-wider uppercase mt-1">{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── SECCIÓN 3 — GALERÍA ───────────── */
+function GalImg({ src, ratio }) {
+  return (
+    <div className={`${ratio} rounded-xl overflow-hidden`}>
+      <img src={src} alt="" loading="lazy"
+        className="object-cover w-full h-full hover:scale-[1.02] transition-transform duration-700" />
+    </div>
+  );
+}
+function Galeria() {
+  return (
+    <section id="galeria" className="px-6 md:px-12 py-24 max-w-7xl mx-auto">
+      <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-4">La experiencia</p>
+      <h2 className="font-serif text-foreground text-3xl sm:text-5xl mb-12">Así se vive Rayo Negro</h2>
+      <div className="grid md:grid-cols-3 gap-3">
+        <div className="flex flex-col gap-3">
+          <GalImg src={IMG.g1} ratio="aspect-[3/4]" />
+          <GalImg src={IMG.g2} ratio="aspect-square" />
+        </div>
+        <div className="flex flex-col gap-3">
+          <GalImg src={IMG.g3} ratio="aspect-square" />
+          <GalImg src={IMG.g4} ratio="aspect-[3/4]" />
+        </div>
+        <div className="flex flex-col gap-3">
+          <GalImg src={IMG.g5} ratio="aspect-square" />
+          <GalImg src={IMG.vaso} ratio="aspect-[3/4]" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── SECCIÓN 4 — BENEFICIOS ───────────── */
+function Benefit({ img, imgPosition = "object-center", imgStyle, num, title, body }) {
+  return (
+    <div className="bg-card rounded-2xl overflow-hidden flex flex-col">
+      <img src={img} alt="" loading="lazy" className={`aspect-video object-cover w-full ${imgPosition}`} style={imgStyle} />
+      <div className="p-8">
+        <div className="text-muted-foreground text-xs mb-4">{num}</div>
+        <h3 className="font-serif text-foreground text-xl mb-3">{title}</h3>
+        <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
+      </div>
+    </div>
+  );
+}
+function Beneficios() {
+  return (
+    <section id="beneficios" className="px-6 md:px-12 py-28 max-w-7xl mx-auto">
+      <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-4">Por qué Rayo Negro</p>
+      <h2 className="font-serif text-foreground text-3xl sm:text-5xl mb-16 max-w-xl">Lo que nos hace distintos</h2>
+      <div className="grid md:grid-cols-3 gap-4">
+        <Benefit img={IMG.b1} num="01" title="Precisión en cada extracción"
+          body="Chemex, AeroPress, prensa francesa o espresso. Cada método es elegido para expresar lo mejor del café del día." />
+        <Benefit img={IMG.b2} imgStyle={{ objectPosition: '50% 50%' }} num="02" title="Origen con propósito"
+          body="Trabajamos con productores seleccionados. Cada grano que llega a nuestra barra tiene una historia que vale la pena conocer." />
+        <Benefit img={IMG.b3} num="03" title="Un espacio para estar"
+          body="No te apuramos. Ven a trabajar, leer, encontrarte con alguien, o simplemente quedarte con una buena taza." />
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── SECCIÓN 5 — TESTIMONIALES ───────────── */
+function Testimonio({ quote, img, name }) {
+  return (
+    <div className="liquid-glass rounded-2xl p-10">
+      <p className="font-serif italic text-foreground text-lg sm:text-xl leading-relaxed mb-6">{quote}</p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full object-cover overflow-hidden shrink-0">
+          <img src={img} alt={name} loading="lazy" className="w-full h-full object-cover" />
+        </div>
+        <div className="text-foreground text-sm">{name}</div>
+      </div>
+    </div>
+  );
+}
+function Testimoniales() {
+  return (
+    <section className="py-28 px-6 bg-black relative overflow-hidden">
+      <img src={IMG.testiBg} alt="" aria-hidden="true" loading="lazy"
+        className="absolute inset-0 w-full h-full opacity-10 object-cover z-0 pointer-events-none" />
+      <div className="relative z-10 max-w-5xl mx-auto">
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-4 text-center">Lo que dicen</p>
+        <h2 className="font-serif text-foreground text-3xl sm:text-5xl mb-16 text-center">Quienes ya lo descubrieron</h2>
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <Testimonio
+            quote="El mejor café que he tomado en Santiago. Cada vez que paso por Ñuñoa, entro. Ya es un ritual."
+            img={IMG.g1} name="Valentina M." />
+          <Testimonio
+            quote="El lugar donde el tiempo se ralentiza. Vine a trabajar y me quedé tres horas. El café de filtro es de otro nivel."
+            img={IMG.g5} name="Tomás R." />
+          <Testimonio
+            quote="Llevo meses viniendo y nunca me han servido lo mismo dos veces. Siempre hay un café nuevo, un origen distinto. Eso es lo que más me gusta."
+            img={IMG.g3} name="Catalina V." />
+          <Testimonio
+            quote="El espacio tiene algo especial. La luz, el silencio, el olor. Uno entra y se olvida de todo lo demás. El cortado es perfecto."
+            img={IMG.g4} name="Martín O." />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── SECCIÓN — ACTIVIDADES ───────────── */
+function Actividad({ img, kicker, title, body }) {
+  return (
+    <div className="bg-card rounded-2xl overflow-hidden flex flex-col group">
+      <div className="aspect-[4/3] overflow-hidden">
+        <img src={img} alt="" loading="lazy"
+          className="object-cover w-full h-full group-hover:scale-[1.03] transition-transform duration-700" />
+      </div>
+      <div className="p-8">
+        <div className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: 'hsl(var(--accent-amber))' }}>{kicker}</div>
+        <h3 className="font-serif text-foreground text-2xl mb-3">{title}</h3>
+        <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
+      </div>
+    </div>
+  );
+}
+function Actividades() {
+  return (
+    <section className="px-6 md:px-12 py-28 max-w-7xl mx-auto">
+      <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-4">Más que una taza</p>
+      <h2 className="font-serif text-foreground text-3xl sm:text-5xl mb-6 max-w-2xl">Cosas que pasan entre sorbo y sorbo</h2>
+      <p className="text-muted-foreground text-base sm:text-lg max-w-xl mb-16 leading-relaxed">
+        Rayo Negro no es solo café. Es un lugar donde las cosas suceden. Estas son algunas de las nuestras.
+      </p>
+      <div className="grid md:grid-cols-2 gap-4">
+        <Actividad img={IMG.vinilo} kicker="Actividad 01" title="Trae tu vinilo"
+          body="¿Tienes un disco que crees que todos deberían escuchar? Tráelo. Nuestra tornamesa es tuya — pones el vinilo, nosotros ponemos el café, y el local suena como tú quieras esa tarde." />
+        <Actividad img={IMG.libros} kicker="Actividad 02" title="Intercambia tu libro"
+          body="Termina un libro, déjalo, llévate otro. Tenemos una pequeña biblioteca viva que crece con cada visita. Trae uno que ya leíste e intercámbialo por alguno de los que esperan en nuestra repisa." />
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── SECCIÓN 6 — CTA ───────────── */
+function CTA() {
+  return (
+    <section id="cta" className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden" data-screen-label="cta">
+      <img src={IMG.ctaBg} alt="" aria-hidden="true" loading="lazy"
+        className="absolute inset-0 w-full h-full object-cover z-0" />
+      <div className="absolute inset-0 bg-black/65 z-[1]"></div>
+      <div className="relative z-10 flex flex-col items-center max-w-3xl">
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-4">Ñuñoa, Santiago</p>
+        <h2 className="font-serif text-foreground text-5xl sm:text-7xl md:text-8xl leading-[0.92] tracking-[-2px] mb-6">
+          Visítanos<br />hoy.
+        </h2>
+        <p className="text-foreground/70 text-base sm:text-lg max-w-lg leading-relaxed mb-2">
+          Av. Irarrázaval 1309, Ñuñoa, Santiago.
+        </p>
+        <p className="text-foreground/70 text-base sm:text-lg max-w-lg leading-relaxed mb-10">
+          Lunes a viernes 8:00–19:00. Sábado 9:00–20:00. Domingo 9:00–14:00. Siempre con café de temporada.
+        </p>
+        <div className="flex gap-4 flex-wrap justify-center">
+          <a href="https://www.google.com/maps/search/?api=1&query=Av.+Irarr%C3%A1zaval+1309%2C+%C3%91u%C3%B1oa%2C+Santiago" target="_blank" rel="noopener" className="liquid-glass rounded-full px-12 py-4 text-sm text-foreground hover:scale-[1.03] transition">
+            Cómo llegar
+          </a>
+          <a href="https://menu.fu.do/cafeteriarayonegro/qr-menu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGn2HXtNvpDWeOosxioalKOJYZ5FnRolcKsvVIst8XNXvacgA6RZECNh9xrdLc_aem_cek8lFLAbDTa-xgl7qfbJg" target="_blank" rel="noopener" className="rounded-full px-12 py-4 text-sm text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30 transition">
+            Ver el menú
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── SECCIÓN 7 — FOOTER ───────────── */
+function Footer() {
+  const links = [
+    { label: "Menú", href: MENU_FUDO, external: true },
+    { label: "Métodos", page: "metodos" },
+    { label: "Venta de café", page: "venta" },
+    { label: "Nosotros", href: "#beneficios" },
+    { label: "Eventos", page: "eventos" },
+    { label: "Calendario", page: "calendario" },
+    { label: "Contacto", href: "#cta" },
+  ];
+  return (
+    <footer className="bg-black border-t border-border">
+      <div className="px-6 md:px-12 py-16 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-12 mb-14">
+          <div>
+            <img src="assets/fotos/logo-footer.webp" alt="Rayo Negro" className="w-24 h-24 object-contain mb-2" />
+            <p className="text-muted-foreground text-sm mt-1 leading-relaxed">Café de especialidad. Santiago, Chile.</p>
+            <p className="text-muted-foreground text-sm mt-1">Av. Irarrázaval 1309, Ñuñoa</p>
+            <p className="text-muted-foreground text-sm mt-3 leading-relaxed">
+              Lunes a viernes 8:00–19:00<br />Sábado 9:00–20:00<br />Domingo 9:00–14:00
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            {links.map((l) => (
+              <a key={l.label}
+                href={l.href || "#"}
+                target={l.external ? "_blank" : undefined}
+                rel={l.external ? "noopener" : undefined}
+                onClick={navHandler(l)}
+                className="text-sm text-muted-foreground hover:text-foreground transition capitalize">{l.label}</a>
+            ))}
+          </div>
+          <div>
+            <p className="text-muted-foreground text-xs tracking-[0.2em] uppercase mb-4">Síguenos</p>
+            <div className="flex flex-col gap-3">
+              <a href="https://www.instagram.com/caferayonegro?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+                @caferayonegro
+              </a>
+              <a href="https://www.facebook.com/rayonegrocafe" target="_blank" rel="noopener" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                Rayo Negro Café
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center items-center pt-8 border-t border-border text-xs text-muted-foreground flex-wrap gap-4">
+          <span className="text-foreground">© 2026 Rayo Negro</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ───────────── PÁGINA — EVENTOS ───────────── */
+function NavbarSimple({ onBack }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  return (
+    <React.Fragment>
+      <nav className="fixed top-0 inset-x-0 z-40 bg-black/70 backdrop-blur-md border-b border-white/5">
+        <div className="px-6 md:px-8 py-6 max-w-7xl mx-auto flex justify-between items-center">
+          <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>
+            <Logo />
+          </a>
+          <div className="hidden lg:flex gap-8 text-sm">
+            {NAV_LINKS.map((l) => (
+              <a key={l.label} href={l.href || "#"}
+                target={l.external ? "_blank" : undefined}
+                rel={l.external ? "noopener" : undefined}
+                onClick={navHandler(l)}
+                className="text-foreground/70 hover:text-foreground transition whitespace-nowrap">{l.label}</a>
+            ))}
+          </div>
+          <button onClick={onBack} className="hidden lg:inline-block liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
+            ← Volver
+          </button>
+          <Hamburger onClick={() => setMenuOpen(true)} />
+        </div>
+      </nav>
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+    </React.Fragment>
+  );
+}
+
+function EventosPage({ onBack }) {
+  const tipos = [
+    { icon: "🎂", label: "Cumpleaños", desc: "Celebra rodeado de buen café y buena gente. Nosotros ponemos el espacio, tú pones la historia." },
+    { icon: "💼", label: "Reuniones de trabajo", desc: "Porque las mejores ideas nacen con una buena taza en la mano. Sin sala de reuniones genérica, sin café de máquina." },
+    { icon: "📖", label: "Clubes de lectura", desc: "El silencio correcto, la iluminación correcta, el café correcto. Un espacio para encontrarse con las palabras." },
+    { icon: "🎤", label: "Lanzamientos y presentaciones", desc: "Marcas, proyectos, libros, discos. Un espacio íntimo que habla de cuidado y carácter." },
+    { icon: "🌿", label: "Talleres y workshops", desc: "Desde cata de cafés hasta clases de fotografía. Un ambiente que inspira a aprender y crear." },
+    { icon: "✨", label: "Lo que imagines", desc: "Si tienes una idea y no sabes si cabe aquí, escríbenos igual. Probablemente sí cabe." },
+  ];
+
+  return (
+    <main className="bg-black min-h-screen text-foreground">
+      <NavbarSimple onBack={onBack} />
+
+      {/* HERO */}
+      <section className="relative min-h-[75vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden pt-24">
+        <img src={IMG.ctaBg} alt="" aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black z-[1]" />
+        <div className="relative z-10 max-w-4xl">
+          <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-6">Rayo Negro · Ñuñoa</p>
+          <h1 className="animate-fade-rise font-serif text-5xl sm:text-7xl md:text-8xl leading-[0.92] tracking-[-2px] font-normal mb-8">
+            Tu momento.<br /><em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>Nuestro espacio.</em>
+          </h1>
+          <p className="animate-fade-rise-delay text-foreground/70 text-base sm:text-xl max-w-2xl mx-auto leading-relaxed">
+            El mismo espacio que te recibe cada mañana<br />
+            puede ser el escenario de tu próxima celebración.
+          </p>
+        </div>
+      </section>
+
+      {/* INTRO */}
+      <section className="px-6 md:px-12 py-24 max-w-4xl mx-auto text-center">
+        <div className="w-12 h-px bg-amber-500/60 mb-10 mx-auto" />
+        <h2 className="font-serif text-3xl sm:text-5xl leading-tight mb-8">
+          Un café que también es tuyo.
+        </h2>
+        <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl mx-auto">
+          Tenemos un espacio con carácter, luz perfecta y el mejor café de la cuadra.
+          Puedes arrendarlo completo para lo que tengas en mente — íntimo, sofisticado, sin protocolos innecesarios.
+          Armamos juntos los detalles.
+        </p>
+      </section>
+
+      {/* TIPOS DE EVENTO */}
+      <section className="px-6 md:px-12 pb-28 max-w-7xl mx-auto">
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-4 text-center">¿Para qué lo usan?</p>
+        <h2 className="font-serif text-3xl sm:text-4xl mb-16 text-center">Cabe casi todo.</h2>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {tipos.map((t) => (
+            <div key={t.label} className="liquid-glass rounded-2xl p-8">
+              <div className="text-3xl mb-4">{t.icon}</div>
+              <h3 className="font-serif text-foreground text-xl mb-3">{t.label}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{t.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA CONTACTO */}
+      <section className="py-28 px-6 bg-black relative overflow-hidden text-center">
+        <div className="w-12 h-px bg-amber-500/60 mb-10 mx-auto" />
+        <h2 className="font-serif text-4xl sm:text-6xl mb-6">
+          ¿Tienes algo en mente?
+        </h2>
+        <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-12 leading-relaxed">
+          Cuéntanos qué quieres celebrar, cuántas personas son y cuándo.
+          Nosotros te respondemos con una propuesta y, por supuesto, un buen café.
+        </p>
+        <a href={`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent('Hola Rayo Negro, quiero conversar sobre un evento')}`} target="_blank" rel="noopener"
+          className="liquid-glass rounded-full px-14 py-5 text-base text-foreground hover:scale-[1.03] transition inline-block">
+          Escríbenos
+        </a>
+        <p className="text-muted-foreground text-xs mt-6 tracking-wider">
+          Av. Irarrázaval 1309, Ñuñoa
+        </p>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
+/* ───────────── PÁGINA — CALENDARIO ───────────── */
+const EFEMERIDES = {
+  '03-21': { label: 'Día Mundial de la Poesía', emoji: '📝', desc: 'Las palabras también se sirven calientes. Un buen poema y un filtro largo, la combinación perfecta.' },
+  '04-23': { label: 'Día Mundial del Libro', emoji: '📚', desc: 'El mejor pretexto para intercambiar uno. Trae el que ya terminaste y llévate el próximo.' },
+  '04-30': { label: 'Día Internacional del Jazz', emoji: '🎷', desc: 'El jazz y el café comparten la misma filosofía: improvisación con criterio. Hoy suena diferente.' },
+  '08-19': { label: 'Día Mundial de la Fotografía', emoji: '📷', desc: 'La mejor luz para una foto siempre fue la de la ventana de un café. Hoy más que nunca.' },
+  '09-21': { label: 'Primer Día de Primavera', emoji: '🌸', desc: 'La estación del café de origen floral. Hoy el Etiopía natural sabe diferente.' },
+  '10-01': { label: 'Día Internacional del Café', emoji: '☕', desc: 'Nuestro año nuevo. El día más importante en el calendario de Rayo Negro. Te esperamos.' },
+  '11-13': { label: 'Día Mundial de la Amabilidad', emoji: '✨', desc: 'Aquí somos amables todos los días. Hoy lo celebramos con una buena conversación y café de temporada.' },
+};
+
+function CalendarioPage({ onBack }) {
+  const now = new Date();
+  const [viewDate, setViewDate] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState(null);
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const dayNames = ['L','M','M','J','V','S','D'];
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const startOffset = (firstDay + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const prevMonth = () => { setViewDate(new Date(year, month - 1, 1)); setSelectedDay(null); };
+  const nextMonth = () => { setViewDate(new Date(year, month + 1, 1)); setSelectedDay(null); };
+
+  const isToday = (d) => d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+  const getEf = (d) => EFEMERIDES[`${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`];
+
+  const cells = [];
+  for (let i = 0; i < startOffset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const selEf = selectedDay ? getEf(selectedDay) : null;
+
+  return (
+    <main className="bg-black min-h-screen text-foreground">
+      <NavbarSimple onBack={onBack} />
+
+      {/* HERO */}
+      <section className="pt-36 pb-16 px-6 text-center max-w-3xl mx-auto">
+        <div className="w-12 h-px bg-amber-500/60 mb-8 mx-auto" />
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-5">Rayo Negro</p>
+        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[0.92] tracking-[-2px] mb-8 font-normal">
+          Calendario de<br /><em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>Efemérides</em>
+        </h1>
+        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+          Hay días que merecen celebrarse con algo más que un saludo. Aquí los marcamos, los nombramos y, cuando podemos, los vivimos dentro del café.
+        </p>
+      </section>
+
+      {/* CALENDAR */}
+      <section className="px-6 pb-28 max-w-2xl mx-auto">
+
+        {/* Month nav */}
+        <div className="flex items-center justify-between mb-10">
+          <button onClick={prevMonth} className="w-12 h-12 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition text-xl">←</button>
+          <div className="text-center">
+            <div className="font-serif text-4xl text-foreground">{monthNames[month]}</div>
+            <div className="text-muted-foreground text-sm mt-1 tracking-widest">{year}</div>
+          </div>
+          <button onClick={nextMonth} className="w-12 h-12 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition text-xl">→</button>
+        </div>
+
+        {/* Day headers */}
+        <div className="grid grid-cols-7 mb-2">
+          {dayNames.map((d, i) => (
+            <div key={i} className="text-center text-xs text-muted-foreground tracking-widest py-2 uppercase">{d}</div>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((day, i) => {
+            if (!day) return <div key={i} />;
+            const ef = getEf(day);
+            const today = isToday(day);
+            const selected = selectedDay === day;
+            return (
+              <button key={i}
+                onClick={() => ef ? setSelectedDay(selected ? null : day) : null}
+                className={[
+                  'aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 transition',
+                  ef ? 'bg-card hover:bg-white/5 cursor-pointer' : 'cursor-default',
+                  today ? 'ring-1 ring-amber-500/60' : '',
+                  selected ? 'ring-1 ring-amber-400' : '',
+                ].join(' ')}
+              >
+                <span className={`text-sm font-light ${today ? 'text-amber-400' : ef ? 'text-foreground' : 'text-muted-foreground/50'}`}>{day}</span>
+                {ef && <span className="text-xs leading-none">{ef.emoji}</span>}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Efeméride detail */}
+        {selEf && (
+          <div className="mt-8 liquid-glass rounded-2xl p-8 animate-fade-rise">
+            <div className="flex items-start gap-5">
+              <span className="text-4xl shrink-0">{selEf.emoji}</span>
+              <div>
+                <div className="text-xs tracking-[0.2em] uppercase mb-2" style={{ color: 'hsl(var(--accent-amber))' }}>
+                  {String(selectedDay).padStart(2,'0')} de {monthNames[month]}
+                </div>
+                <h3 className="font-serif text-2xl text-foreground mb-3">{selEf.label}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{selEf.desc}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Legend */}
+        <p className="text-muted-foreground text-xs mt-8 text-center tracking-wide">
+          Los días con ícono son efemérides. Toca uno para ver el detalle.
+        </p>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
+/* ───────────── PÁGINA — MÉTODOS ───────────── */
+function MetodosPage({ onBack }) {
+  const metodos = [
+    {
+      num: "01", title: "Filtrado",
+      body: "El método más limpio. El agua atraviesa el café en un goteo lento y constante, revelando las notas más delicadas — florales, cítricas, brillantes. Para quien quiere escuchar el origen sin interrupciones.",
+    },
+    {
+      num: "02", title: "Chemex",
+      body: "Elegancia de laboratorio. Su filtro grueso retiene los aceites y entrega una taza translúcida, nítida, casi cristalina. El método para una sobremesa larga y una conversación que no tiene apuro.",
+    },
+    {
+      num: "03", title: "AeroPress",
+      body: "Rápida, precisa, intensa. Presión e inmersión en menos de dos minutos. Cuerpo redondo y acidez bajo control. El favorito silencioso de los que de verdad saben.",
+    },
+    {
+      num: "04", title: "Máquina espresso",
+      body: "El corazón de la barra. Nueve bares de presión que concentran todo el carácter del grano en apenas treinta mililitros. La base de tu cortado, tu flat white, tu cappuccino.",
+    },
+    {
+      num: "05", title: "Prensa francesa",
+      body: "Inmersión total, sin filtros de papel. El café conserva todos sus aceites — cuerpo pleno, textura densa, sabor sin concesiones. Quizás el método más honesto de todos.",
+    },
+    {
+      num: "06", title: "Moka italiana",
+      body: "El ritual de la cocina italiana. Vapor a presión que sube y se transforma en un café robusto, concentrado, con alma de casa. Tradición en cada borboteo.",
+    },
+  ];
+
+  return (
+    <main className="bg-black min-h-screen text-foreground">
+      <NavbarSimple onBack={onBack} />
+
+      {/* HERO */}
+      <section className="pt-36 pb-16 px-6 text-center max-w-3xl mx-auto">
+        <div className="w-12 h-px bg-amber-500/60 mb-8 mx-auto" />
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-5">Rayo Negro · La barra</p>
+        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[0.92] tracking-[-2px] mb-8 font-normal">
+          Seis formas de<br /><em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>preparar el tuyo</em>
+        </h1>
+        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+          El mismo grano cuenta una historia distinta según cómo lo extraigas. Aquí no hay un método mejor que otro — hay uno para cada momento, cada paladar, cada tarde.
+        </p>
+      </section>
+
+      {/* MÉTODOS */}
+      <section className="px-6 md:px-12 pb-28 max-w-7xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {metodos.map((m) => (
+            <div key={m.num} className="liquid-glass rounded-2xl p-8 flex flex-col">
+              <div className="font-serif text-3xl mb-5" style={{ color: 'hsl(var(--accent-amber))' }}>{m.num}</div>
+              <h3 className="font-serif text-foreground text-2xl mb-3">{m.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{m.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CIERRE */}
+      <section className="py-24 px-6 bg-black text-center">
+        <div className="w-12 h-px bg-amber-500/60 mb-10 mx-auto" />
+        <h2 className="font-serif text-3xl sm:text-5xl mb-6 max-w-2xl mx-auto leading-tight">
+          ¿No sabes cuál es el tuyo?
+        </h2>
+        <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-12 leading-relaxed">
+          Ven a la barra y cuéntanos cómo te gusta el café. Nosotros te recomendamos el método — y, si quieres, te lo explicamos mientras lo preparamos.
+        </p>
+        <button onClick={onBack}
+          className="liquid-glass rounded-full px-14 py-5 text-base text-foreground hover:scale-[1.03] transition inline-block">
+          Visítanos
+        </button>
+        <p className="text-muted-foreground text-xs mt-6 tracking-wider">
+          Av. Irarrázaval 1309, Ñuñoa
+        </p>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
+/* ───────────── PÁGINA — VENTA DE CAFÉ ───────────── */
+
+// ⚙️ CONFIGURACIÓN — reemplaza estos valores cuando los tengas:
+// AIRTABLE — el cliente administra los productos desde airtable.com (ver guía abajo)
+//   1) Token de lectura (Personal Access Token con scope data.records:read)
+const AIRTABLE_TOKEN = "patWAIT19txLkOBW2.95b62b8f0ad1329a2ccd685d7cd29e9afd2021004aef8e744042f508cc920a36";
+//   2) ID de la base (empieza con "app", aparece en la URL de Airtable y en la API docs)
+const AIRTABLE_BASE = "appaLZQ1Zc6GZlqmf";
+//   3) Nombre exacto de la tabla (por defecto "Productos")
+const AIRTABLE_TABLE = "Productos";
+// WHATSAPP — número en formato internacional sin + ni espacios (Chile: 569XXXXXXXX)
+const WHATSAPP_NUMERO = "56999688045";
+
+// Productos de ejemplo (se muestran mientras no configures Airtable; sirven de plantilla de columnas)
+const PRODUCTOS_FALLBACK = [
+  { nombre: "Etiopía Yirgacheffe", origen: "Etiopía", descripcion: "Notas florales, cítricas y un final a té negro. Nuestro café más brillante.", precio: "9990", formato: "250g · grano o molido", imagen: "" },
+  { nombre: "Colombia Huila", origen: "Colombia", descripcion: "Caramelo, panela y un toque de naranja. Equilibrado y dulce, para todos los días.", precio: "8990", formato: "250g · grano o molido", imagen: "" },
+  { nombre: "Guatemala Antigua", origen: "Guatemala", descripcion: "Chocolate, nuez y cuerpo redondo. El favorito de quienes aman el café con carácter.", precio: "9490", formato: "250g · grano o molido", imagen: "" },
+];
+
+// Convierte un registro de Airtable (campos en español) al formato interno
+function mapAirtableRecord(fields) {
+  const get = (...keys) => {
+    for (const k of keys) {
+      const found = Object.keys(fields).find((f) => f.trim().toLowerCase() === k);
+      if (found && fields[found] != null && fields[found] !== '') return fields[found];
+    }
+    return '';
+  };
+  const att = get('imagen', 'foto', 'image');
+  const imagen = Array.isArray(att) ? (att[0] && att[0].url) || '' : (att || '');
+  return {
+    nombre: get('nombre', 'name', 'producto'),
+    origen: get('origen', 'origin'),
+    descripcion: get('descripcion', 'descripción', 'description', 'detalle'),
+    precio: String(get('precio', 'price') || ''),
+    formato: get('formato', 'format', 'presentacion', 'presentación'),
+    imagen,
+    disponible: String(get('disponible', 'available') ?? 'si'),
+  };
+}
+
+function formatPrecio(v) {
+  const n = Number(String(v).replace(/[^0-9]/g, ''));
+  if (!n) return "";
+  return "$" + n.toLocaleString('es-CL');
+}
+
+function ProductoCard({ p }) {
+  const precio = formatPrecio(p.precio);
+  const msg = `Hola Rayo Negro, quiero pedir: ${p.nombre}${p.formato ? ` (${p.formato})` : ''}${precio ? ` — ${precio}` : ''}`;
+  const wa = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
+  return (
+    <div className="bg-card rounded-2xl overflow-hidden flex flex-col">
+      <div className="aspect-square overflow-hidden bg-black/40 flex items-center justify-center">
+        {p.imagen
+          ? <img src={p.imagen} alt={p.nombre} loading="lazy" className="object-cover w-full h-full" />
+          : <span className="font-serif text-muted-foreground/40 text-5xl">⚡</span>}
+      </div>
+      <div className="p-7 flex flex-col flex-1">
+        {p.origen && <div className="text-xs tracking-[0.2em] uppercase mb-2" style={{ color: 'hsl(var(--accent-amber))' }}>{p.origen}</div>}
+        <h3 className="font-serif text-foreground text-2xl mb-3">{p.nombre}</h3>
+        {p.descripcion && <p className="text-muted-foreground text-sm leading-relaxed mb-5">{p.descripcion}</p>}
+        <div className="mt-auto">
+          {p.formato && <div className="text-muted-foreground text-xs mb-3">{p.formato}</div>}
+          <div className="flex items-center justify-between gap-3">
+            {precio && <span className="font-serif text-foreground text-2xl">{precio}</span>}
+            <a href={wa} target="_blank" rel="noopener"
+              className="liquid-glass rounded-full px-5 py-2.5 text-sm text-foreground hover:scale-[1.03] transition shrink-0">
+              Pedir por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VentaCafePage({ onBack }) {
+  const configurado = Boolean(AIRTABLE_TOKEN && AIRTABLE_BASE);
+  const [estado, setEstado] = useState(configurado ? 'cargando' : 'sin-configurar');
+  const [productos, setProductos] = useState(configurado ? [] : PRODUCTOS_FALLBACK);
+
+  useEffect(() => {
+    if (!configurado) return;
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}?pageSize=100`;
+    fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } })
+      .then((r) => {
+        if (!r.ok) throw new Error('airtable-error');
+        return r.json();
+      })
+      .then((data) => {
+        if (!data || !Array.isArray(data.records)) throw new Error('airtable-error');
+        const items = data.records
+          .map((rec) => mapAirtableRecord(rec.fields || {}))
+          .filter((p) => p.nombre && p.disponible.toLowerCase() !== 'no');
+        setProductos(items);
+        setEstado(items.length ? 'ok' : 'vacio');
+      })
+      .catch(() => setEstado('error'));
+  }, []);
+
+  return (
+    <main className="bg-black min-h-screen text-foreground">
+      <NavbarSimple onBack={onBack} />
+
+      {/* HERO */}
+      <section className="pt-36 pb-16 px-6 text-center max-w-3xl mx-auto">
+        <div className="w-12 h-px bg-amber-500/60 mb-8 mx-auto" />
+        <p className="text-muted-foreground text-xs tracking-[0.3em] uppercase mb-5">Rayo Negro · La tienda</p>
+        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[0.92] tracking-[-2px] mb-8 font-normal">
+          Llévate el café<br /><em className="not-italic" style={{ color: 'hsl(var(--accent-amber))' }}>a tu casa</em>
+        </h1>
+        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+          Los mismos granos que servimos en la barra, tostados en lotes pequeños y listos para tu método favorito. Elige el tuyo y escríbenos por WhatsApp para tenerlo listo.
+        </p>
+      </section>
+
+      {/* GRID DE PRODUCTOS */}
+      <section className="px-6 md:px-12 pb-28 max-w-7xl mx-auto">
+        {estado === 'cargando' && (
+          <p className="text-center text-muted-foreground text-sm py-16">Cargando catálogo…</p>
+        )}
+
+        {estado === 'error' && (
+          <div className="text-center max-w-md mx-auto py-16">
+            <p className="text-foreground text-lg mb-3">No pudimos cargar el catálogo en este momento.</p>
+            <p className="text-muted-foreground text-sm mb-7 leading-relaxed">Escríbenos por WhatsApp y te contamos qué café tenemos disponible hoy.</p>
+            <a href={`https://wa.me/${WHATSAPP_NUMERO}`} target="_blank" rel="noopener"
+              className="liquid-glass rounded-full px-8 py-3 text-sm text-foreground inline-block hover:scale-[1.03] transition">
+              Escribir por WhatsApp
+            </a>
+          </div>
+        )}
+
+        {estado === 'vacio' && (
+          <p className="text-center text-muted-foreground text-sm py-16">Por ahora no tenemos cafés disponibles. Vuelve pronto.</p>
+        )}
+
+        {(estado === 'ok' || estado === 'sin-configurar') && (
+          <React.Fragment>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {productos.map((p, i) => <ProductoCard key={i} p={p} />)}
+            </div>
+            <p className="text-muted-foreground text-xs mt-10 text-center tracking-wide">
+              Precios por bolsa. Disponibilidad sujeta al tueste de la semana.
+            </p>
+          </React.Fragment>
+        )}
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
+const VALID_PAGES = ['metodos', 'venta', 'eventos', 'calendario'];
+function pageFromHash() {
+  const h = (window.location.hash || '').replace('#', '');
+  return VALID_PAGES.includes(h) ? h : 'home';
+}
+
+function App() {
+  const [page, setPageState] = useState(pageFromHash());
+
+  window.setPage = (p) => {
+    setPageState(p);
+    const hash = p === 'home' ? '' : `#${p}`;
+    if (window.location.hash !== hash) {
+      window.history.pushState({ page: p }, '', window.location.pathname + window.location.search + hash);
+    }
+  };
+
+  useEffect(() => {
+    const onPopState = () => setPageState(pageFromHash());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  useEffect(() => { window.scrollTo(0, 0); }, [page]);
+
+  if (page === 'eventos') return <EventosPage onBack={() => window.setPage('home')} />;
+  if (page === 'calendario') return <CalendarioPage onBack={() => window.setPage('home')} />;
+  if (page === 'metodos') return <MetodosPage onBack={() => window.setPage('home')} />;
+  if (page === 'venta') return <VentaCafePage onBack={() => window.setPage('home')} />;
+
+  return (
+    <main>
+      <Hero />
+      <Trust />
+      <Galeria />
+      <Beneficios />
+      <Testimoniales />
+      <Actividades />
+      <CTA />
+      <Footer />
+    </main>
+  );
+}
+
+export default App;
