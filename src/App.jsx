@@ -513,7 +513,7 @@ function EventosPage({ onBack }) {
   ];
 
   return (
-    <main className="bg-black min-h-screen text-foreground">
+    <main id="main-content" className="bg-black min-h-screen text-foreground">
       <NavbarSimple onBack={onBack} />
 
       {/* HERO */}
@@ -624,7 +624,7 @@ function CalendarioPage({ onBack }) {
   const selEf = selectedDay ? getEf(selectedDay) : null;
 
   return (
-    <main className="bg-black min-h-screen text-foreground">
+    <main id="main-content" className="bg-black min-h-screen text-foreground">
       <NavbarSimple onBack={onBack} />
 
       {/* HERO */}
@@ -676,7 +676,7 @@ function CalendarioPage({ onBack }) {
                   selected ? 'ring-1 ring-amber-400' : '',
                 ].join(' ')}
               >
-                <span className={`text-sm font-light ${today ? 'text-amber-400' : ef ? 'text-foreground' : 'text-muted-foreground/50'}`}>{day}</span>
+                <span className={`text-sm font-light ${today ? 'text-amber-400' : ef ? 'text-foreground' : 'text-muted-foreground'}`}>{day}</span>
                 {ef && <span className="text-xs leading-none">{ef.emoji}</span>}
               </button>
             );
@@ -740,7 +740,7 @@ function MetodosPage({ onBack }) {
   ];
 
   return (
-    <main className="bg-black min-h-screen text-foreground">
+    <main id="main-content" className="bg-black min-h-screen text-foreground">
       <NavbarSimple onBack={onBack} />
 
       {/* HERO */}
@@ -894,7 +894,7 @@ function VentaCafePage({ onBack }) {
   }, []);
 
   return (
-    <main className="bg-black min-h-screen text-foreground">
+    <main id="main-content" className="bg-black min-h-screen text-foreground">
       <NavbarSimple onBack={onBack} />
 
       {/* HERO */}
@@ -972,13 +972,13 @@ function App() {
 
   useEffect(() => { window.scrollTo(0, 0); }, [page]);
 
-  if (page === 'eventos') return <EventosPage onBack={() => window.setPage('home')} />;
-  if (page === 'calendario') return <CalendarioPage onBack={() => window.setPage('home')} />;
-  if (page === 'metodos') return <MetodosPage onBack={() => window.setPage('home')} />;
-  if (page === 'venta') return <VentaCafePage onBack={() => window.setPage('home')} />;
-
-  return (
-    <main>
+  let content;
+  if (page === 'eventos') content = <EventosPage onBack={() => window.setPage('home')} />;
+  else if (page === 'calendario') content = <CalendarioPage onBack={() => window.setPage('home')} />;
+  else if (page === 'metodos') content = <MetodosPage onBack={() => window.setPage('home')} />;
+  else if (page === 'venta') content = <VentaCafePage onBack={() => window.setPage('home')} />;
+  else content = (
+    <main id="main-content">
       <Hero />
       <Trust />
       <Galeria />
@@ -988,6 +988,13 @@ function App() {
       <CTA />
       <Footer />
     </main>
+  );
+
+  return (
+    <React.Fragment>
+      <a href="#main-content" className="skip-link">Saltar al contenido</a>
+      {content}
+    </React.Fragment>
   );
 }
 
