@@ -64,9 +64,9 @@ function navHandler(link, onDone) {
   };
 }
 
-function Hamburger({ onClick }) {
+function Hamburger({ onClick, open }) {
   return (
-    <button onClick={onClick} aria-label="Abrir menú"
+    <button onClick={onClick} aria-label="Abrir menú" aria-expanded={!!open} aria-haspopup="true"
       className="lg:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5">
       <span className="block w-6 h-px bg-foreground"></span>
       <span className="block w-6 h-px bg-foreground"></span>
@@ -76,13 +76,54 @@ function Hamburger({ onClick }) {
 }
 
 function MobileMenu({ open, onClose }) {
+  const closeBtnRef = useRef(null);
+  const panelRef = useRef(null);
+  const lastFocusedRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      lastFocusedRef.current = document.activeElement;
+      document.body.style.overflow = 'hidden';
+      closeBtnRef.current?.focus();
+    } else {
+      document.body.style.overflow = '';
+      if (lastFocusedRef.current instanceof HTMLElement) lastFocusedRef.current.focus();
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && panelRef.current) {
+        const focusable = panelRef.current.querySelectorAll('a[href], button');
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open, onClose]);
+
   return (
-    <div className={`fixed inset-0 z-[60] md:hidden transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+    <div aria-hidden={!open} className={`fixed inset-0 z-[60] md:hidden transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
       <div className="absolute inset-0 bg-black/95" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} onClick={onClose}></div>
-      <div className="relative z-10 flex flex-col h-full px-8 py-6">
+      <div ref={panelRef} role="dialog" aria-modal="true" aria-label="Menú de navegación" className="relative z-10 flex flex-col h-full px-8 py-6">
         <div className="flex justify-between items-center">
           <Logo />
-          <button onClick={onClose} aria-label="Cerrar menú"
+          <button ref={closeBtnRef} onClick={onClose} aria-label="Cerrar menú" tabIndex={open ? 0 : -1}
             className="w-11 h-11 flex items-center justify-center text-foreground text-2xl leading-none hover:opacity-70 transition">✕</button>
         </div>
         <nav className="flex flex-col gap-7 mt-16">
@@ -92,11 +133,12 @@ function MobileMenu({ open, onClose }) {
               target={l.external ? "_blank" : undefined}
               rel={l.external ? "noopener" : undefined}
               onClick={navHandler(l, onClose)}
+              tabIndex={open ? 0 : -1}
               className="font-serif text-3xl text-foreground/90 hover:text-foreground transition">
               {l.label}
             </a>
           ))}
-          <a href="#cta" onClick={(e) => { e.preventDefault(); window.setPage('home'); onClose(); setTimeout(() => { const el = document.getElementById('cta'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60); }}
+          <a href="#cta" tabIndex={open ? 0 : -1} onClick={(e) => { e.preventDefault(); window.setPage('home'); onClose(); setTimeout(() => { const el = document.getElementById('cta'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60); }}
             className="liquid-glass rounded-full px-8 py-4 text-base text-foreground text-center mt-6">
             Encuéntranos
           </a>
@@ -149,7 +191,7 @@ function Hero() {
         <a href="#cta" className="hidden lg:inline-block liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
           Encuéntranos
         </a>
-        <Hamburger onClick={() => setMenuOpen(true)} />
+        <Hamburger open={menuOpen} onClick={() => setMenuOpen(true)} />
       </nav>
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
@@ -452,7 +494,7 @@ function NavbarSimple({ onBack }) {
           <button onClick={onBack} className="hidden lg:inline-block liquid-glass rounded-full px-6 py-2.5 text-sm text-foreground hover:scale-[1.03] transition">
             ← Volver
           </button>
-          <Hamburger onClick={() => setMenuOpen(true)} />
+          <Hamburger open={menuOpen} onClick={() => setMenuOpen(true)} />
         </div>
       </nav>
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
