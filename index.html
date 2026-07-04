@@ -672,12 +672,12 @@ function EventosPage({ onBack }) {
           Cuéntanos qué quieres celebrar, cuántas personas son y cuándo.
           Nosotros te respondemos con una propuesta y, por supuesto, un buen café.
         </p>
-        <a href="mailto:contacto@rayonegro.cl"
+        <a href={`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent('Hola Rayo Negro, quiero conversar sobre un evento')}`} target="_blank" rel="noopener"
           className="liquid-glass rounded-full px-14 py-5 text-base text-foreground hover:scale-[1.03] transition inline-block">
           Escríbenos
         </a>
         <p className="text-muted-foreground text-xs mt-6 tracking-wider">
-          Av. Irarrázaval 1309, Ñuñoa · contacto@rayonegro.cl
+          Av. Irarrázaval 1309, Ñuñoa
         </p>
       </section>
 
